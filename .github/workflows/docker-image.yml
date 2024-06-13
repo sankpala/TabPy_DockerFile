@@ -28,11 +28,11 @@ jobs:
       run: docker build . --file Dockerfile --tag my-image-name:${{ steps.timestamp.outputs.tag }}
 
     - name: Run Docker container
-      run: docker run -d --name my-container --memory=4g my-image-name:${{ steps.timestamp.outputs.tag }}
+      run: docker run -d --name my-container --publish 9004:9004 --memory=4g my-image-name:${{ steps.timestamp.outputs.tag }}
 
     - name: Run TabPy
       run: |
-        docker exec my-container tabpy --port=9004 &
+        docker exec my-container tabpy --port=9004 --hostname 0.0.0.0 &
 
     - name: Install ngrok
       run: |
@@ -47,7 +47,11 @@ jobs:
       run: ngrok authtoken $NGROK_TOKEN
 
     - name: Expose TabPy with ngrok
-      run: ngrok http 9004
+      run: |
+        pkill ngrok  # Kill ngrok process if it's still running from previous attempts
+        ngrok http 9004 &
+        sleep 10  # Wait for ngrok to start
+
 
     - name: Get ngrok public URL
       id: ngrok
