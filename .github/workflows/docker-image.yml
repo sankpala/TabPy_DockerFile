@@ -48,7 +48,7 @@ jobs:
 
     - name: Expose TabPy with ngrok
       run: |
-        pkill ngrok  # Kill ngrok process if it's still running from previous attempts
+        pkill ngrok || true  # Kill ngrok process if it's still running from previous attempts
         ngrok http 9004 &
         sleep 10  # Wait for ngrok to start
 
