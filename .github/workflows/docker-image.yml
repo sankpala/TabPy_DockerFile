@@ -30,9 +30,8 @@ jobs:
     - name: Run Docker container
       run: docker run -d --name my-container --memory=4g my-image-name:${{ steps.timestamp.outputs.tag }}
 
-    - name: Install TabPy
+    - name: Run TabPy
       run: |
-        docker exec my-container pip install tabpy
         docker exec my-container tabpy --port=9004 &
 
     - name: Install ngrok
