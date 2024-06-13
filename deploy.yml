@@ -1,0 +1,36 @@
+name: Run TabPy with ngrok
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and run TabPy
+      run: |
+        docker build -t tabpy .
+        docker run -d -p 9004:9004 tabpy
+
+    - name: Download ngrok
+      run: |
+        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+        && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list \
+        && sudo apt-get update && sudo apt-get install ngrok
+
+    - name: Start ngrok
+      run: |
+        ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+        nohup ngrok http 9004 &
+
+    - name: Display ngrok URL
+      run: sleep 10 && curl http://localhost:4040/api/tunnels | jq '.tunnels[0].public_url'
