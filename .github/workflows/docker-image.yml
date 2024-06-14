@@ -50,8 +50,7 @@ jobs:
       run: |
         pkill ngrok || true  # Kill ngrok process if it's still running from previous attempts
         ngrok http 80 &   # Start ngrok to expose TabPy on port 9004 via HTTP
-        sleep 10             # Wait for ngrok to start
-        curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url  # Output ngrok public URL
+        #curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url  # Output ngrok public URL
 
     - name: Display ngrok URL
       run: echo "TabPy is accessible via ${{ steps.ngrok.outputs.ngrok_url }}"
