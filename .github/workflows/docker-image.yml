@@ -47,10 +47,14 @@ jobs:
       run: ngrok authtoken $NGROK_TOKEN
 
     - name: Expose TabPy with ngrok
+      run: ngrok http 9004
+
+    - name: Get ngrok public URL
+      id: ngrok
       run: |
-        pkill ngrok || true  # Kill ngrok process if it's still running from previous attempts
-        ngrok http 80 &   # Start ngrok to expose TabPy on port 9004 via HTTP
-        #curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url  # Output ngrok public URL
+        sleep 5
+        curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url
+        echo "::set-output name=ngrok_url::$(curl -s http://localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)"
 
     - name: Display ngrok URL
       run: echo "TabPy is accessible via ${{ steps.ngrok.outputs.ngrok_url }}"
